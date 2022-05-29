@@ -1,0 +1,9 @@
+﻿  ConsoleGraphicsEngine.cpp
+C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\olcConsoleGameEngine.h(759,1): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\olcConsoleGameEngine.h(1099,1): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\olcConsoleGameEngine.h(1196,1): warning C4312: 'type cast': conversion from 'DWORD' to 'olcConsoleGameEngine *' of greater size
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 261 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  ConsoleGraphicsEngine.vcxproj -> C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\x64\Release\ConsoleGraphicsEngine.exe
