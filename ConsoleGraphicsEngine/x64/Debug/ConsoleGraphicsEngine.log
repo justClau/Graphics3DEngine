@@ -2,10 +2,10 @@
 C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\olcConsoleGameEngineGL.h(1229,1): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
 C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\olcConsoleGameEngineGL.h(1796,1): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
 C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\olcConsoleGameEngineGL.h(1893,1): warning C4312: 'type cast': conversion from 'DWORD' to 'olcConsoleGameEngine *' of greater size
-C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\ConsoleGraphicsEngine.cpp(165,55): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\ConsoleGraphicsEngine.cpp(165,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\ConsoleGraphicsEngine.cpp(164,55): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\ConsoleGraphicsEngine.cpp(164,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\ConsoleGraphicsEngine.cpp(163,64): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\ConsoleGraphicsEngine.cpp(163,43): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\ConsoleGraphicsEngine.cpp(297,55): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\ConsoleGraphicsEngine.cpp(297,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\ConsoleGraphicsEngine.cpp(296,55): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\ConsoleGraphicsEngine.cpp(296,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\ConsoleGraphicsEngine.cpp(295,64): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\ConsoleGraphicsEngine\ConsoleGraphicsEngine.cpp(295,43): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
   ConsoleGraphicsEngine.vcxproj -> C:\Users\claud\Desktop\cppGraphicsEngine\ConsoleGraphicsEngineApp\x64\Debug\ConsoleGraphicsEngine.exe

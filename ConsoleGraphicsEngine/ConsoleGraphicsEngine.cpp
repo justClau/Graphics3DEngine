@@ -1,5 +1,8 @@
 #include "olcConsoleGameEngineGL.h"
 
+#include <fstream>
+#include <strstream>
+#include <algorithm>
 
 //3d vector
 struct vec3d 
@@ -10,11 +13,49 @@ struct vec3d
 struct triangle 
 {
     vec3d p[3];
+
+    wchar_t sym;
+    short col;
 };
 
 struct mesh
 {
     std::vector<triangle> tris;
+
+    bool LoadObjectFromFile(std::string sFileName)
+    {
+        std::ifstream f(sFileName);
+        if (!f.is_open())
+            return false;
+
+        //Local Cache
+        std::vector<vec3d> verts;
+        while (!f.eof())
+        {
+            char line[128];
+            f.getline(line,128);
+            std::strstream s;
+            s << line;
+
+            char junk;
+            if (line[0] == 'v')
+            {
+                vec3d v;
+                s >> junk >> v.x >> v.y >> v.z;
+                verts.push_back(v);
+            }
+
+            if (line[0] == 'f')
+            {
+                int f[3];
+                s >> junk >> f[0] >> f[1] >> f[2];
+                tris.push_back({ verts[f[0] - 1], verts[f[1] - 1], verts[f[2] - 2] });
+            }
+        }
+
+        f.close();
+        return true;
+    }
 };
 
 struct mat4x4
@@ -35,6 +76,7 @@ public:
 private:
     mesh meshCube;
     mat4x4 matProj;
+    vec3d vCamera;
     float fTheta = 0.0f;
 
     void MultiplyMatrixVector(vec3d& i, vec3d& o, mat4x4& m)
@@ -52,36 +94,71 @@ private:
             o.z /= w;
         }
     }
+    //Functie pentru determinarea culorii in functie de luminozitate(Scrisa special pentru Consola || Preluat);
+    CHAR_INFO GetColour(float lum)
+    {
+        short bg_col, fg_col;
+        wchar_t sym;
+        int pixel_bw = (int)(13.0f * lum);
+        switch (pixel_bw)
+        {
+            case 0: bg_col = BG_BLACK; fg_col = FG_BLACK; sym = PIXEL_SOLID; break;
+
+            case 1: bg_col = BG_BLACK; fg_col = FG_DARK_GREY; sym = PIXEL_QUARTER; break;
+            case 2: bg_col = BG_BLACK; fg_col = FG_DARK_GREY; sym = PIXEL_HALF; break;
+            case 3: bg_col = BG_BLACK; fg_col = FG_DARK_GREY; sym = PIXEL_THREEQUARTERS; break;
+            case 4: bg_col = BG_BLACK; fg_col = FG_DARK_GREY; sym = PIXEL_SOLID; break;
+
+            case 5: bg_col = BG_DARK_GREY; fg_col = FG_GREY; sym = PIXEL_QUARTER; break;
+            case 6: bg_col = BG_DARK_GREY; fg_col = FG_GREY; sym = PIXEL_HALF; break;
+            case 7: bg_col = BG_DARK_GREY; fg_col = FG_GREY; sym = PIXEL_THREEQUARTERS; break;
+            case 8: bg_col = BG_DARK_GREY; fg_col = FG_GREY; sym = PIXEL_SOLID; break;
+
+            case 9:  bg_col = BG_GREY; fg_col = FG_WHITE; sym = PIXEL_QUARTER; break;
+            case 10: bg_col = BG_GREY; fg_col = FG_WHITE; sym = PIXEL_HALF; break;
+            case 11: bg_col = BG_GREY; fg_col = FG_WHITE; sym = PIXEL_THREEQUARTERS; break;
+            case 12: bg_col = BG_GREY; fg_col = FG_WHITE; sym = PIXEL_SOLID; break;
+            
+            default: bg_col = BG_BLACK; fg_col = FG_BLACK; sym = PIXEL_SOLID;
+        }
+
+        CHAR_INFO c;
+        c.Attributes = bg_col | fg_col;
+        c.Char.UnicodeChar = sym;
+        return c;
+    }
 
 
 public:
     bool OnUserCreate() override 
     {
-        meshCube.tris = {
-            //sud
-            {0.0f, 0.0f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f, 0.0f},
-            {0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 0.0f, 0.0f},
+        //meshCube.tris = {
+        //    //sud
+        //    {0.0f, 0.0f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f, 0.0f},
+        //    {0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 0.0f, 0.0f},
 
-            //est
-            {1.0f, 0.0f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 1.0f, 1.0f},
-            {1.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,   1.0f, 0.0f, 1.0f},
+        //    //est
+        //    {1.0f, 0.0f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 1.0f, 1.0f},
+        //    {1.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,   1.0f, 0.0f, 1.0f},
 
-            //nord
-            {1.0f, 0.0f, 1.0f,   1.0f, 1.0f, 1.0f,   0.0f, 1.0f, 1.0f},
-            {1.0f, 0.0f, 1.0f,   0.0f, 1.0f, 1.0f,   0.0f, 0.0f, 1.0f},
+        //    //nord
+        //    {1.0f, 0.0f, 1.0f,   1.0f, 1.0f, 1.0f,   0.0f, 1.0f, 1.0f},
+        //    {1.0f, 0.0f, 1.0f,   0.0f, 1.0f, 1.0f,   0.0f, 0.0f, 1.0f},
 
-            //vest
-            {0.0f, 0.0f, 1.0f,   0.0f, 1.0f, 1.0f,   0.0f, 1.0f, 0.0f},
-            {0.0f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f, 0.0f},
+        //    //vest
+        //    {0.0f, 0.0f, 1.0f,   0.0f, 1.0f, 1.0f,   0.0f, 1.0f, 0.0f},
+        //    {0.0f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f, 0.0f},
 
-            //top
-            {0.0f, 1.0f, 0.0f,   0.0f, 1.0f, 1.0f,   1.0f, 1.0f, 1.0f},
-            {0.0f, 1.0f, 0.0f,   1.0f, 1.0f, 1.0f,   1.0f, 1.0f, 0.0f},
+        //    //top
+        //    {0.0f, 1.0f, 0.0f,   0.0f, 1.0f, 1.0f,   1.0f, 1.0f, 1.0f},
+        //    {0.0f, 1.0f, 0.0f,   1.0f, 1.0f, 1.0f,   1.0f, 1.0f, 0.0f},
 
-            //bottom
-            {1.0f, 0.0f, 1.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, 0.0f},
-            {1.0f, 0.0f, 1.0f,   0.0f, 0.0f, 0.0f,   1.0f, 0.0f, 0.0f}
-        };
+        //    //bottom
+        //    {1.0f, 0.0f, 1.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, 0.0f},
+        //    {1.0f, 0.0f, 1.0f,   0.0f, 0.0f, 0.0f,   1.0f, 0.0f, 0.0f}
+        //};
+
+        meshCube.LoadObjectFromFile("Hat.obj");
 
         // Matricea de proiectie
 
@@ -109,14 +186,14 @@ public:
 
         mat4x4 matRotX, matRotZ;
         fTheta += 1.0f * fElapsedTime;
-
+        //Matrice pentru rotatie in jurul axei Z
         matRotZ.m[0][0] = cosf(fTheta);
         matRotZ.m[0][1] = sinf(fTheta);
         matRotZ.m[1][0] = -sinf(fTheta);
         matRotZ.m[1][1] = cosf(fTheta);
         matRotZ.m[2][2] = 1;
         matRotZ.m[3][3] = 1;
-
+        //Matrice pentru rotatie in jurul axei X
         matRotX.m[0][0] = 1;
         matRotX.m[1][1] = cosf(fTheta * 0.5f);
         matRotX.m[1][2] = sinf(fTheta * 0.5f);
@@ -124,46 +201,106 @@ public:
         matRotX.m[2][2] = cosf(fTheta * 0.5f);
         matRotX.m[3][3] = 1;
 
+        std::vector<triangle> vecTrianglesToRaster;
 
         for (auto tri : meshCube.tris)
         {
             triangle triProjected, triTranslated, triRotatedZ, triRotatedZX;
             
+            // Rotatia in Z
             MultiplyMatrixVector(tri.p[0], triRotatedZ.p[0], matRotZ);
             MultiplyMatrixVector(tri.p[1], triRotatedZ.p[1], matRotZ);
             MultiplyMatrixVector(tri.p[2], triRotatedZ.p[2], matRotZ);
-
+            //Rotatia in X
             MultiplyMatrixVector(triRotatedZ.p[0], triRotatedZX.p[0], matRotX);
             MultiplyMatrixVector(triRotatedZ.p[1], triRotatedZX.p[1], matRotX);
             MultiplyMatrixVector(triRotatedZ.p[2], triRotatedZX.p[2], matRotX);
             
-            
+            //Translatia pe axa Z
             triTranslated = triRotatedZX;
-            triTranslated.p[0].z = triRotatedZX.p[0].z + 3.0f;
-            triTranslated.p[1].z = triRotatedZX.p[1].z + 3.0f;
-            triTranslated.p[2].z = triRotatedZX.p[2].z + 3.0f;
+            triTranslated.p[0].z = triRotatedZX.p[0].z + 8.0f;
+            triTranslated.p[1].z = triRotatedZX.p[1].z + 8.0f;
+            triTranslated.p[2].z = triRotatedZX.p[2].z + 8.0f;
 
 
-            MultiplyMatrixVector(triTranslated.p[0], triProjected.p[0], matProj);
-            MultiplyMatrixVector(triTranslated.p[1], triProjected.p[1], matProj);
-            MultiplyMatrixVector(triTranslated.p[2], triProjected.p[2], matProj);
+            //Normala la suprafata triunghiului pentru a determina care triunghi va fi proiectat in 2d
+            vec3d normal, line1, line2;
 
-            //scale into view
-            triProjected.p[0].x += 1.0f; triProjected.p[0].y += 1.0f;
-            triProjected.p[1].x += 1.0f; triProjected.p[1].y += 1.0f;
-            triProjected.p[2].x += 1.0f; triProjected.p[2].y += 1.0f;
+            line1.x = triTranslated.p[1].x - triTranslated.p[0].x;
+            line1.y = triTranslated.p[1].y - triTranslated.p[0].y;
+            line1.z = triTranslated.p[1].z - triTranslated.p[0].z;
 
-            triProjected.p[0].x *= 0.5f * (float)ScreenWidth();
-            triProjected.p[0].y *= 0.5f * (float)ScreenHeight();
-            triProjected.p[1].x *= 0.5f * (float)ScreenWidth();
-            triProjected.p[1].y *= 0.5f * (float)ScreenHeight();
-            triProjected.p[2].x *= 0.5f * (float)ScreenWidth();
-            triProjected.p[2].y *= 0.5f * (float)ScreenHeight();
+            line2.x = triTranslated.p[2].x - triTranslated.p[0].x;
+            line2.y = triTranslated.p[2].y - triTranslated.p[0].y;
+            line2.z = triTranslated.p[2].z - triTranslated.p[0].z;
 
-            DrawTriangle(triProjected.p[0].x, triProjected.p[0].y,
+            normal.x = line1.y * line2.z - line1.z * line2.y;
+            normal.y = line1.z * line2.x - line1.x * line2.z;
+            normal.z = line1.x * line2.y - line1.y * line2.x;
+
+            float l = sqrtf(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+            normal.x /= l; normal.y /= l; normal.z /= l;
+
+            //if (normal.z < 0)
+            if (normal.x * (triTranslated.p[0].x - vCamera.x) +
+                normal.y * (triTranslated.p[0].y - vCamera.y) +
+                normal.z * (triTranslated.p[0].z - vCamera.z) < 0.0f)
+            {
+                //Iluminare
+                vec3d lightDirection = { 0.0f, 0.0f, -1.0f };
+                float l = sqrtf(lightDirection.x * lightDirection.x + lightDirection.y * lightDirection.y + lightDirection.z * lightDirection.z);
+                lightDirection.x /= l; lightDirection.y /= l; lightDirection.z /= l;
+
+                //Produsul Scalar dintre normala si directia luminii;
+                float dp = normal.x * lightDirection.x + normal.y * lightDirection.y + normal.z * lightDirection.z;
+
+                //Obtinem culoarea in functie de produsul scalar;
+                CHAR_INFO c = GetColour(dp);
+                triTranslated.col = c.Attributes;
+                triTranslated.sym = c.Char.UnicodeChar;
+
+                //Proiectia triunghiului din 3D in 2D
+                MultiplyMatrixVector(triTranslated.p[0], triProjected.p[0], matProj);
+                MultiplyMatrixVector(triTranslated.p[1], triProjected.p[1], matProj);
+                MultiplyMatrixVector(triTranslated.p[2], triProjected.p[2], matProj);
+                triProjected.col = triTranslated.col;
+                triProjected.sym = triTranslated.sym;
+
+                //scale into view
+                triProjected.p[0].x += 1.0f; triProjected.p[0].y += 1.0f;
+                triProjected.p[1].x += 1.0f; triProjected.p[1].y += 1.0f;
+                triProjected.p[2].x += 1.0f; triProjected.p[2].y += 1.0f;
+
+                triProjected.p[0].x *= 0.5f * (float)ScreenWidth();
+                triProjected.p[0].y *= 0.5f * (float)ScreenHeight();
+                triProjected.p[1].x *= 0.5f * (float)ScreenWidth();
+                triProjected.p[1].y *= 0.5f * (float)ScreenHeight();
+                triProjected.p[2].x *= 0.5f * (float)ScreenWidth();
+                triProjected.p[2].y *= 0.5f * (float)ScreenHeight();
+
+                vecTrianglesToRaster.push_back(triProjected);
+            }
+        }
+
+        std::sort(vecTrianglesToRaster.begin(), vecTrianglesToRaster.end(), [](triangle& t1, triangle& t2) 
+        {
+            float z1 = (t1.p[0].z + t1.p[1].z + t1.p[2].z) / 3.0f;
+            float z2 = (t2.p[0].z + t2.p[1].z + t2.p[2].z) / 3.0f;
+            return z1 > z2;
+        });
+
+        for (auto& triProjected : vecTrianglesToRaster)
+        {
+            //Desenarea Triunghiului la Consola
+            FillTriangle(triProjected.p[0].x, triProjected.p[0].y,
                 triProjected.p[1].x, triProjected.p[1].y,
                 triProjected.p[2].x, triProjected.p[2].y,
-                PIXEL_SOLID, FG_WHITE);
+                triProjected.sym, triProjected.col);
+
+            /*DrawTriangle(triProjected.p[0].x, triProjected.p[0].y,
+                triProjected.p[1].x, triProjected.p[1].y,
+                triProjected.p[2].x, triProjected.p[2].y,
+                PIXEL_SOLID, FG_WHITE);*/
         }
 
         return true;
